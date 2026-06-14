@@ -1,5 +1,7 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
+import { onSnapshot, setDoc } from 'firebase/firestore'
 import { SCHEDULE_SEED } from './data.js'
+import { sharedDoc } from './firebase.js'
 
 const KEY = 'move-checklist-react-v1'
 
@@ -9,33 +11,75 @@ function initialState() {
   return { status: {}, notes: {}, custom: {}, moveStatus: {}, moveCustom: [], schedule: cloneSeed() }
 }
 
-function load() {
+// מנרמל אובייקט נתונים גולמי (מ-localStorage או מ-Firestore) למבנה התקין
+function normalize(s) {
+  if (!s || typeof s !== 'object') return initialState()
+  return {
+    status: s.status || {},
+    notes: s.notes || {},
+    custom: s.custom || {},
+    moveStatus: s.moveStatus || {},
+    moveCustom: s.moveCustom || [],
+    // schedule שלא קיים כלל => משתמשים בשלבים המוצעים; רשימה ריקה נשמרת כפי שהיא
+    schedule: s.schedule === undefined ? cloneSeed() : s.schedule,
+  }
+}
+
+// טעינה ראשונית מהיר מ-localStorage (תצוגה מיידית עד שמגיע המידע מהענן)
+function loadLocal() {
   try {
-    const s = JSON.parse(localStorage.getItem(KEY))
-    if (s && typeof s === 'object') {
-      return {
-        status: s.status || {},
-        notes: s.notes || {},
-        custom: s.custom || {},
-        moveStatus: s.moveStatus || {},
-        moveCustom: s.moveCustom || [],
-        // schedule שלא קיים כלל => משתמשים בשלבים המוצעים; רשימה ריקה נשמרת כפי שהיא
-        schedule: s.schedule === undefined ? cloneSeed() : s.schedule,
-      }
-    }
-  } catch (e) { /* ignore */ }
-  return initialState()
+    return normalize(JSON.parse(localStorage.getItem(KEY)))
+  } catch (e) {
+    return initialState()
+  }
 }
 
 let counter = 0
 const uid = (p) => `${p}${Date.now()}_${counter++}`
 
 export function useChecklist() {
-  const [state, setState] = useState(load)
+  const [state, setState] = useState(loadLocal)
+  // האם התקבל כבר העדכון הראשון מהענן (מונע דריסה של נתוני הענן לפני שהגיעו)
+  const [ready, setReady] = useState(false)
+  // דגל שמסמן שהשינוי הנוכחי הגיע מהענן — כדי לא לכתוב אותו בחזרה (מניעת לולאה)
+  const fromRemote = useRef(false)
 
+  // האזנה בזמן אמת לשינויים מהענן (גם של רותם וגם שלך ממכשירים אחרים)
   useEffect(() => {
+    const unsub = onSnapshot(
+      sharedDoc,
+      (snap) => {
+        if (snap.exists()) {
+          fromRemote.current = true
+          setState(normalize(snap.data()))
+        }
+        // אם המסמך עדיין לא קיים — נשאיר את המצב המקומי, וה-effect הבא ייצור אותו בענן
+        setReady(true)
+      },
+      (err) => {
+        console.error('Firestore listen error:', err)
+        setReady(true)
+      },
+    )
+    return unsub
+  }, [])
+
+  // כתיבה לענן (ול-localStorage כגיבוי) בכל שינוי מקומי
+  useEffect(() => {
+    // תמיד שומרים עותק מקומי לטעינה מהירה בפעם הבאה
     try { localStorage.setItem(KEY, JSON.stringify(state)) } catch (e) { /* ignore */ }
-  }, [state])
+
+    // לא כותבים לענן לפני שקיבלנו את העדכון הראשון משם
+    if (!ready) return
+    // אם השינוי הגיע מהענן — לא כותבים אותו בחזרה
+    if (fromRemote.current) { fromRemote.current = false; return }
+
+    // השהיה קצרה כדי לקבץ שינויים מהירים (למשל הקלדת הערה) לכתיבה אחת
+    const id = setTimeout(() => {
+      setDoc(sharedDoc, state).catch((e) => console.error('Firestore write error:', e))
+    }, 400)
+    return () => clearTimeout(id)
+  }, [state, ready])
 
   // ----- מסך המשימות -----
   const setStatus = useCallback((id, val) => {
