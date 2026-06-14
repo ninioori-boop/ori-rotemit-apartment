@@ -89,6 +89,18 @@ export const MOVING_ITEMS = [
   { id: 'mv-micro',       emoji: '♨️', label: 'מיקרוגל' },
   { id: 'mv-tami4',       emoji: '🚰', label: 'תמי 4' },
   { id: 'mv-coffee',      emoji: '☕', label: 'מכונת קפה' },
+  // כלי ניקיון
+  { id: 'mv-clean1', emoji: '🧴', label: 'חומר ניקוי רצפה' },
+  { id: 'mv-clean2', emoji: '🧽', label: 'ספוגים וסמרטוטים' },
+  { id: 'mv-clean3', emoji: '🧹', label: 'מטאטא ומגב' },
+  { id: 'mv-clean4', emoji: '🪣', label: 'דלי ניקיון' },
+  { id: 'mv-clean5', emoji: '🧻', label: 'נייר טואלט' },
+  // שירותים
+  { id: 'mv-bath1', emoji: '🚿', label: 'וילון מקלחת' },
+  { id: 'mv-bath2', emoji: '🪥', label: 'מחזיק מברשות שיניים' },
+  { id: 'mv-bath3', emoji: '🧴', label: 'מתקן סבון לשירותים' },
+  { id: 'mv-bath4', emoji: '🪞', label: 'מראה לשירותים' },
+  { id: 'mv-bath5', emoji: '🏠', label: 'ארון שירותים / מדף' },
 ]
 
 // ===== מסך הלו"ז: שלבים מוצעים (אפשר לערוך/למחוק/להוסיף) =====
