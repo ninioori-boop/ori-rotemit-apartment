@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { MOVING_ITEMS, MOVE_OPTIONS } from '../data.js'
 import TaskRow from './TaskRow.jsx'
+import Breakdown from './Breakdown.jsx'
 
 const FILTERS = [
   { id: 'all', label: 'הכל' },
+  { id: 'tenant', label: '🔑 מהדיירת' },
   { id: 'gindi', label: '🏠 גינדי' },
   { id: 'kingeorge', label: "🏛️ קינג ג'ורג'" },
   { id: 'buy', label: '🛒 לקנות' },
@@ -17,10 +19,24 @@ export default function MovingView({ state, onStatus, onNote, onAdd, onRemove })
   const items = [...MOVING_ITEMS, ...state.moveCustom]
   const stOf = (id) => state.moveStatus[id] || ''
 
+  const tenant = items.filter((t) => stOf(t.id) === 'tenant').length
   const gindi = items.filter((t) => stOf(t.id) === 'gindi').length
   const king = items.filter((t) => stOf(t.id) === 'kingeorge').length
   const buy = items.filter((t) => stOf(t.id) === 'buy').length
   const none = items.filter((t) => !stOf(t.id)).length
+
+  // קיבוץ המוצרים לפי מצב — לרשימה המסכמת בתחתית
+  const inGroup = (key) =>
+    items
+      .filter((t) => stOf(t.id) === key)
+      .map((t) => ({ ...t, note: state.notes[t.id] || '' }))
+
+  const groups = [
+    { key: 'tenant', label: 'מהדיירת', emoji: '🔑', cls: 'tenant', items: inGroup('tenant') },
+    { key: 'buy', label: 'לקנות', emoji: '🛒', cls: 'buy', items: inGroup('buy') },
+    { key: 'gindi', label: 'מגינדי', emoji: '🏠', cls: 'gindi', items: inGroup('gindi') },
+    { key: 'kingeorge', label: "מקינג ג'ורג'", emoji: '🏛️', cls: 'king', items: inGroup('kingeorge') },
+  ]
 
   const passes = (t) => {
     const st = stOf(t.id)
@@ -33,6 +49,7 @@ export default function MovingView({ state, onStatus, onNote, onAdd, onRemove })
   const submit = () => { onAdd(draft); setDraft('') }
 
   return (
+    <>
     <section className="cat">
       <div className="cat-head">
         <div className="cat-ic">🚚</div>
@@ -43,6 +60,7 @@ export default function MovingView({ state, onStatus, onNote, onAdd, onRemove })
       </div>
 
       <div className="move-summary">
+        <span className="chip tenant">🔑 מהדיירת <b>{tenant}</b></span>
         <span className="chip gindi">🏠 גינדי <b>{gindi}</b></span>
         <span className="chip king">🏛️ קינג ג'ורג' <b>{king}</b></span>
         <span className="chip buy">🛒 לקנות <b>{buy}</b></span>
@@ -92,5 +110,13 @@ export default function MovingView({ state, onStatus, onNote, onAdd, onRemove })
         <button onClick={submit}>＋ הוספה</button>
       </div>
     </section>
+
+    <Breakdown
+      icon="🗂️"
+      title="סיכום לפי מקור"
+      subtitle="איזה מוצר מגיע מאיפה — מהדיירת, לקנות, מגינדי או מקינג ג'ורג'"
+      groups={groups}
+    />
+    </>
   )
 }

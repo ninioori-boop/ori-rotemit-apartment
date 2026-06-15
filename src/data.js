@@ -66,6 +66,7 @@ export const OWNERS = {
 
 // ===== מסך ההובלה: בורר מצב לכל מוצר =====
 export const MOVE_OPTIONS = {
+  tenant:    { label: 'לקנות מהדיירת',     emoji: '🔑', cls: 'on-tenant',    rowCls: 'move-tenant' },
   gindi:     { label: 'קיים בגינדי',       emoji: '🏠', cls: 'on-gindi',     rowCls: 'move-gindi' },
   kingeorge: { label: "קיים בקינג ג'ורג'", emoji: '🏛️', cls: 'on-kingeorge', rowCls: 'move-kingeorge' },
   buy:       { label: 'צריך לקנות',        emoji: '🛒', cls: 'on-buy',       rowCls: 'move-buy' },

@@ -9,6 +9,7 @@ import Filters from './components/Filters.jsx'
 import CategoryCard from './components/CategoryCard.jsx'
 import MovingView from './components/MovingView.jsx'
 import ScheduleView from './components/ScheduleView.jsx'
+import Breakdown from './components/Breakdown.jsx'
 
 export default function App() {
   const cl = useChecklist()
@@ -31,6 +32,18 @@ export default function App() {
   const uriOpen = all.filter((t) => state.status[t.id] === 'uri').length
   const rotemOpen = all.filter((t) => state.status[t.id] === 'rotem').length
   const unassigned = all.filter((t) => !state.status[t.id]).length
+
+  // קיבוץ המשימות לפי שיוך — לרשימה המסכמת בתחתית מסך המשימות
+  const taskGroup = (key) =>
+    all
+      .filter((t) => state.status[t.id] === key)
+      .map((t) => ({ ...t, note: state.notes[t.id] || '' }))
+
+  const taskGroups = [
+    { key: 'uri', label: 'אורי', emoji: '👨', cls: 'uri', items: taskGroup('uri') },
+    { key: 'rotem', label: 'רותם', emoji: '👩', cls: 'rotem', items: taskGroup('rotem') },
+    { key: 'done', label: 'הושלם', emoji: '✅', cls: 'done', items: taskGroup('done') },
+  ]
 
   // קונפטי גדול כשמסיימים את כל המשימות
   const celebrated = useRef(false)
@@ -71,6 +84,13 @@ export default function App() {
               />
             ))}
           </div>
+
+          <Breakdown
+            icon="🧑‍🤝‍🧑"
+            title="חלוקת המשימות"
+            subtitle="מה על אורי, מה על רותם ומה כבר הושלם"
+            groups={taskGroups}
+          />
         </>
       )}
 

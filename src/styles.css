@@ -120,7 +120,7 @@ li.task.owner-uri { background: #f3f9fe; }
 li.task.owner-rotem { background: #fffaf0; }
 
 /* בורר שיוך: אורי / רותם / הושלם */
-.seg { display: inline-flex; margin-top: 11px; gap: 3px; background: #eef4fa; padding: 3px; border-radius: 999px; border: 1px solid var(--line); }
+.seg { display: inline-flex; flex-wrap: wrap; margin-top: 11px; gap: 3px; background: #eef4fa; padding: 3px; border-radius: 18px; border: 1px solid var(--line); }
 .seg button {
   border: 0; background: transparent; font-family: inherit; font-weight: 700; font-size: 13px;
   color: var(--ink-soft); padding: 7px 14px; border-radius: 999px; cursor: pointer; transition: .15s;
@@ -186,19 +186,64 @@ footer .flag { letter-spacing: 2px; font-size: 16px; }
 
 /* ===== מסך הובלה ===== */
 .move-summary { display: flex; gap: 8px; flex-wrap: wrap; padding: 14px 20px 2px; }
+.move-summary .chip.tenant b { color: #7c4ddb; }
 .move-summary .chip.gindi b { color: var(--celeste-deep); }
 .move-summary .chip.king b { color: var(--gold-deep); }
 .move-summary .chip.buy b { color: #e85b6e; }
 
 .filters.inner { margin: 12px 20px 6px; }
 
+.seg button.on-tenant    { background: #8b5cf6; color: #fff; box-shadow: var(--shadow-sm); }
 .seg button.on-gindi     { background: var(--celeste-deep); color: #fff; box-shadow: var(--shadow-sm); }
 .seg button.on-kingeorge { background: var(--gold); color: #5a4200; box-shadow: var(--shadow-sm); }
 .seg button.on-buy       { background: #e85b6e; color: #fff; box-shadow: var(--shadow-sm); }
 
+li.task.move-tenant    { background: #f7f4ff; }
 li.task.move-gindi     { background: #f3f9fe; }
 li.task.move-kingeorge { background: #fffaf0; }
 li.task.move-buy       { background: #fff4f5; }
+
+/* ===== רשימה מסכמת מקובצת (משימות + הובלה) ===== */
+.breakdown {
+  background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow);
+  border: 1px solid var(--line); margin-top: 18px; overflow: hidden;
+}
+.breakdown .cat-head .cat-ic { background: var(--gold); }
+.breakdown-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 12px; padding: 16px 20px 20px;
+}
+.bd-col { border: 1px solid var(--line); border-radius: 16px; background: #fbfdff; overflow: hidden; }
+.bd-col-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 11px 14px; font-weight: 800; font-size: 14.5px; border-bottom: 1px solid var(--line);
+}
+.bd-col-head b {
+  font-size: 13px; min-width: 24px; text-align: center; padding: 2px 8px;
+  border-radius: 999px; background: #eef4fa; color: var(--ink);
+}
+.bd-col ul { list-style: none; padding: 6px; display: flex; flex-direction: column; gap: 2px; }
+.bd-col li {
+  display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 10px;
+  font-size: 14px; font-weight: 600;
+}
+.bd-col li:hover { background: #fff; }
+.bd-em { font-size: 16px; flex: none; }
+.bd-label { flex: 1; min-width: 0; }
+.bd-note {
+  font-size: 11.5px; font-weight: 700; color: var(--ink-soft);
+  background: #fff; border: 1px solid var(--line); padding: 2px 8px; border-radius: 999px; white-space: nowrap;
+}
+.bd-empty { padding: 14px; text-align: center; color: var(--ink-soft); font-size: 13px; font-weight: 500; }
+
+/* גוון לכותרת לפי קבוצה */
+.bd-col.tenant .bd-col-head { background: #f7f4ff; } .bd-col.tenant .bd-col-head b { background: #ece5ff; color: #7c4ddb; }
+.bd-col.buy    .bd-col-head { background: #fff4f5; } .bd-col.buy    .bd-col-head b { background: #ffe1e5; color: #e85b6e; }
+.bd-col.gindi  .bd-col-head { background: #f3f9fe; } .bd-col.gindi  .bd-col-head b { background: var(--celeste-soft); color: var(--celeste-deep); }
+.bd-col.king   .bd-col-head { background: #fffaf0; } .bd-col.king   .bd-col-head b { background: #ffeec2; color: var(--gold-deep); }
+.bd-col.uri    .bd-col-head { background: #f3f9fe; } .bd-col.uri    .bd-col-head b { background: var(--celeste-soft); color: var(--celeste-deep); }
+.bd-col.rotem  .bd-col-head { background: #fffaf0; } .bd-col.rotem  .bd-col-head b { background: #ffeec2; color: var(--gold-deep); }
+.bd-col.done   .bd-col-head { background: #f4fbf7; } .bd-col.done   .bd-col-head b { background: #d6f3e3; color: var(--ok); }
 
 /* ===== מסך לו״ז ===== */
 ul.timeline { list-style: none; }
