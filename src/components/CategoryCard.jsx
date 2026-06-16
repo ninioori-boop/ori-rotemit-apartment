@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import TaskRow from './TaskRow.jsx'
 
-export default function CategoryCard({ category, tasks, filter, state, onStatus, onNote, onAdd, onRemove }) {
+export default function CategoryCard({ category, tasks, filter, search = '', state, onStatus, onNote, onAdd, onRemove }) {
   const [draft, setDraft] = useState('')
 
   const doneCount = tasks.filter((t) => state.status[t.id] === 'done').length
 
+  const q = search.trim().toLowerCase()
   const passes = (t) => {
+    if (q && !t.label.toLowerCase().includes(q)) return false
     const st = state.status[t.id] || ''
     if (filter === 'todo') return st !== 'done'
     if (filter === 'done') return st === 'done'
@@ -15,6 +17,9 @@ export default function CategoryCard({ category, tasks, filter, state, onStatus,
     return true
   }
   const visible = tasks.filter(passes)
+
+  // בזמן חיפוש — להציג רק קטגוריות שיש בהן תוצאה
+  if (q && visible.length === 0) return null
 
   const submit = () => { onAdd(category.id, draft); setDraft('') }
 
@@ -40,6 +45,7 @@ export default function CategoryCard({ category, tasks, filter, state, onStatus,
             task={t}
             status={state.status[t.id] || ''}
             note={state.notes[t.id] || ''}
+            query={search.trim()}
             onStatus={onStatus}
             onNote={onNote}
             onRemove={(id) => onRemove(category.id, id)}

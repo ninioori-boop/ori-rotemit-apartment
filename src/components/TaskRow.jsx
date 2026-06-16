@@ -2,8 +2,22 @@ import { useState } from 'react'
 import { OWNERS } from '../data.js'
 import { burstAt } from '../confetti.js'
 
+// מדגיש את החלק התואם לחיפוש בתוך טקסט
+function highlight(text, q) {
+  if (!q) return text
+  const i = text.toLowerCase().indexOf(q.toLowerCase())
+  if (i === -1) return text
+  return (
+    <>
+      {text.slice(0, i)}
+      <mark>{text.slice(i, i + q.length)}</mark>
+      {text.slice(i + q.length)}
+    </>
+  )
+}
+
 export default function TaskRow({
-  task, status, note,
+  task, status, note, query = '',
   options = OWNERS, confettiKey = 'done',
   onStatus, onNote, onRemove,
 }) {
@@ -23,7 +37,7 @@ export default function TaskRow({
       <div className="body">
         <div className="label">
           <span className="emoji">{task.emoji || '📌'}</span>
-          <span>{task.label}</span>
+          <span>{highlight(task.label, query)}</span>
         </div>
         {task.detail && <div className="detail">{task.detail}</div>}
 

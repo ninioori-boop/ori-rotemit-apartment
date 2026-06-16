@@ -10,12 +10,14 @@ import CategoryCard from './components/CategoryCard.jsx'
 import MovingView from './components/MovingView.jsx'
 import ScheduleView from './components/ScheduleView.jsx'
 import Breakdown from './components/Breakdown.jsx'
+import SearchBar from './components/SearchBar.jsx'
 
 export default function App() {
   const cl = useChecklist()
   const { state } = cl
   const [tab, setTab] = useState('tasks')
   const [filter, setFilter] = useState('all')
+  const [search, setSearch] = useState('')
 
   // משלב משימות בסיס + משימות מותאמות לכל קטגוריה
   const merged = useMemo(
@@ -68,6 +70,11 @@ export default function App() {
             done={done} total={total}
             uriOpen={uriOpen} rotemOpen={rotemOpen} unassigned={unassigned}
           />
+          <SearchBar
+            value={search}
+            onChange={setSearch}
+            placeholder="חיפוש משימה… (למשל: ספה, גז, מדיח)"
+          />
           <Filters current={filter} onChange={setFilter} onReset={handleReset} />
           <div id="board">
             {merged.map(({ category, tasks }) => (
@@ -76,6 +83,7 @@ export default function App() {
                 category={category}
                 tasks={tasks}
                 filter={filter}
+                search={search}
                 state={state}
                 onStatus={cl.setStatus}
                 onNote={cl.setNote}
@@ -83,6 +91,14 @@ export default function App() {
                 onRemove={cl.removeTask}
               />
             ))}
+            {search.trim() &&
+              merged.every(({ category, tasks }) =>
+                tasks.filter((t) => t.label.toLowerCase().includes(search.trim().toLowerCase())).length === 0
+              ) && (
+                <div className="empty-hint" style={{ display: 'block' }}>
+                  לא נמצאו משימות שמתאימות ל"{search.trim()}"
+                </div>
+              )}
           </div>
 
           <Breakdown

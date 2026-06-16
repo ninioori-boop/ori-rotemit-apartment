@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { MOVING_ITEMS, MOVE_OPTIONS } from '../data.js'
 import TaskRow from './TaskRow.jsx'
 import Breakdown from './Breakdown.jsx'
+import SearchBar from './SearchBar.jsx'
 
 const FILTERS = [
   { id: 'all', label: 'הכל' },
@@ -15,6 +16,7 @@ const FILTERS = [
 export default function MovingView({ state, onStatus, onNote, onAdd, onRemove }) {
   const [draft, setDraft] = useState('')
   const [filter, setFilter] = useState('all')
+  const [query, setQuery] = useState('')
 
   const items = [...MOVING_ITEMS, ...state.moveCustom]
   const stOf = (id) => state.moveStatus[id] || ''
@@ -38,7 +40,9 @@ export default function MovingView({ state, onStatus, onNote, onAdd, onRemove })
     { key: 'kingeorge', label: "מקינג ג'ורג'", emoji: '🏛️', cls: 'king', items: inGroup('kingeorge') },
   ]
 
+  const q = query.trim().toLowerCase()
   const passes = (t) => {
+    if (q && !t.label.toLowerCase().includes(q)) return false
     const st = stOf(t.id)
     if (filter === 'all') return true
     if (filter === 'none') return !st
@@ -67,6 +71,14 @@ export default function MovingView({ state, onStatus, onNote, onAdd, onRemove })
         <span className="chip">⚪ לא סומן <b>{none}</b></span>
       </div>
 
+      <div className="search-wrap">
+        <SearchBar
+          value={query}
+          onChange={setQuery}
+          placeholder="חיפוש מוצר… (למשל: ספה, מקרר, וילון)"
+        />
+      </div>
+
       <div className="filters inner">
         {FILTERS.map((f) => (
           <button
@@ -86,6 +98,7 @@ export default function MovingView({ state, onStatus, onNote, onAdd, onRemove })
             task={t}
             status={stOf(t.id)}
             note={state.notes[t.id] || ''}
+            query={query.trim()}
             options={MOVE_OPTIONS}
             confettiKey={null}
             onStatus={onStatus}
@@ -96,7 +109,9 @@ export default function MovingView({ state, onStatus, onNote, onAdd, onRemove })
       </ul>
 
       {visible.length === 0 && (
-        <div className="empty-hint" style={{ display: 'block' }}>אין מוצרים להצגה בסינון הזה</div>
+        <div className="empty-hint" style={{ display: 'block' }}>
+          {q ? `לא נמצאו מוצרים שמתאימים ל"${query.trim()}"` : 'אין מוצרים להצגה בסינון הזה'}
+        </div>
       )}
 
       <div className="add-row">
